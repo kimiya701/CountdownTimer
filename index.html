@@ -4,23 +4,109 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Countdown Timer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            text-align: center;
+            max-width: 400px;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        input {
+            width: 100%;
+            padding: 10px 0px 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .countdown {
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>Countdown Timer</h1>
         <input type="datetime-local" id="dateInput" placeholder="Select a date and time">
-        <button id="StartBtn">Start Countdown</button>
+        <button id="startButton">Start Countdown</button>
         <div id="error" class="error"></div>
         <div id="countdown" class="countdown">Enter a date to start the countdown.</div>
     </div>
 
     <script>
         const dateInput = document.getElementById('dateInput');
-        const startBtn = document.getElementById('startBtn');
+        const startButton = document.getElementById('startButton');
         const countdownDisplay = document.getElementById('countdown');
         const errorDisplay = document.getElementById('error');
 
-        
+        let countdownInterval;
+
+        startButton.addEventListener('click', () => {
+            const targetDate = new Date(dateInput.value);
+            
+            if (isNaN(targetDate.getTime())) {
+                errorDisplay.textContent = "Please enter a valid date.";
+                return;
+            }
+
+            const now = new Date();
+            if (targetDate <= now) {
+                errorDisplay.textContent = "Please select a future date.";
+                return;
+            }
+
+            errorDisplay.textContent = "";
+
+            clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => updateCountdown(targetDate), 1000);
+            updateCountdown(targetDate);
+        });
+
+        function updateCountdown(targetDate) {
+            const now = new Date();
+            const timeDifference = targetDate - now;
+
+            if (timeDifference <= 0) {
+                clearInterval(countdownInterval);
+                countdownDisplay.textContent = "Time's up!";
+                return;
+            }
+
+            const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+
+            countdownDisplay.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
     </script>
 </body>
 </html>
